@@ -111,7 +111,7 @@ int main(int argc, char **argv)
       old_nodes = numa_bitmask_alloc(nr_nodes);
         new_nodes = numa_bitmask_alloc(nr_nodes);
         numa_bitmask_setbit(old_nodes, 1);
-        numa_bitmask_setbit(new_nodes, 0);
+        numa_bitmask_setbit(new_nodes, 2);
 
       if (nr_nodes < 2) {
             printf("A minimum of 2 nodes is required for this test.\n");
@@ -234,7 +234,7 @@ int main(int argc, char **argv)
 	if (strncmp(batch_mode, "batch", 5) == 0)
 		move_page_flag |= (1<<7);
 
-	rc = syscall(333,0, page_count, from_addr, to_addr, status, move_page_flag);
+	rc = syscall(439,0, page_count, from_addr, to_addr, status, move_page_flag);
 
 
       if (rc < 0 && errno != ENOENT) {

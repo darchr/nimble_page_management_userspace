@@ -57,7 +57,7 @@ void print_paddr_and_flags(char *bigmem, int pagemap_file, int kpageflags_file)
 
 
 		if (kpageflags_file) {
-			pread(kpageflags_file, &page_flags, sizeof(page_flags), 
+			pread(kpageflags_file, &page_flags, sizeof(page_flags),
 				  (paddr & PFN_MASK)*sizeof(page_flags));
 
 			fprintf(stderr, "vpn: 0x%lx, pfn: 0x%lx is %s %s, %s, %s\n",
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
       old_nodes = numa_bitmask_alloc(nr_nodes);
         new_nodes = numa_bitmask_alloc(nr_nodes);
         numa_bitmask_setbit(old_nodes, 1);
-        numa_bitmask_setbit(new_nodes, 0);
+        numa_bitmask_setbit(new_nodes, 2);
 
       if (nr_nodes < 2) {
             printf("A minimum of 2 nodes is required for this test.\n");
@@ -276,13 +276,13 @@ int main(int argc, char **argv)
       for (i = 0; i < page_count; i++) {
             /*printf("Page %d vaddr=%lx node=%d\n", i,*/
                   /*(unsigned long)(pages + i * pagesize), status[i]);*/
-			
+
 		      for (j = 0; j < pagesize; j+= 4096)
 				  if (pages[ i* pagesize + j ] != (char) i) {
 						fprintf(stderr, "*** Page %d contents corrupted.\n", i);
 						errors++;
-				  } 
-			  if (status[i]) {
+				  }
+			  if (status[i] != 2) {
 					fprintf(stderr, "*** Page %d on the wrong node\n", i);
 					errors++;
 			  }
