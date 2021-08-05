@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <time.h>
 
 
 unsigned int pagesize;
@@ -81,9 +82,11 @@ void print_paddr_and_flags(char *bigmem, int pagemap_file, int kpageflags_file)
 int main(int argc, char **argv)
 {
       int i, rc;
-	unsigned long begin = 0, end = 0;
-	unsigned cycles_high, cycles_low;
-	unsigned cycles_high1, cycles_low1;
+	//unsigned long begin = 0, end = 0;
+	//unsigned cycles_high, cycles_low;
+	//unsigned cycles_high1, cycles_low1;
+    clock_t begin, end;
+    double cpu_time_used;
 	const char *move_pages_stats = "/proc/%d/move_pages_breakdown";
 	const char *pagemap_template = "/proc/%d/pagemap";
 	const char *kpageflags_proc = "/proc/kpageflags";
@@ -175,17 +178,18 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 
-	asm volatile
-	( "CPUID\n\t"
-	  "RDTSC\n\t"
-	  "mov %%edx, %0\n\t"
-	  "mov %%eax, %1\n\t"
-	  :
-	  "=r" (cycles_high), "=r" (cycles_low)
-	  ::
-	  "rax", "rbx", "rcx", "rdx"
-	);
-	begin = ((uint64_t)cycles_high <<32 | cycles_low);
+	//asm volatile
+	//( "CPUID\n\t"
+	//  "RDTSC\n\t"
+	//  "mov %%edx, %0\n\t"
+	//  "mov %%eax, %1\n\t"
+	//  :
+	//  "=r" (cycles_high), "=r" (cycles_low)
+	//  ::
+	//  "rax", "rbx", "rcx", "rdx"
+	//);
+	//begin = ((uint64_t)cycles_high <<32 | cycles_low);
+    begin = clock();
 
       /* Move to starting node */
 	if (strncmp(transfer_method, "dma", 3) == 0)
@@ -200,18 +204,20 @@ int main(int argc, char **argv)
             perror("move_pages");
             exit(1);
       }
-	asm volatile
-	( "RDTSCP\n\t"
-	  "mov %%edx, %0\n\t"
-	  "mov %%eax, %1\n\t"
-	  "CPUID\n\t"
-	  :
-	  "=r" (cycles_high1), "=r" (cycles_low1)
-	  ::
-	  "rax", "rbx", "rcx", "rdx"
-	);
+    end = clock();
+	//asm volatile
+	//( "RDTSCP\n\t"
+	//  "mov %%edx, %0\n\t"
+	//  "mov %%eax, %1\n\t"
+	//  "CPUID\n\t"
+	//  :
+	//  "=r" (cycles_high1), "=r" (cycles_low1)
+	//  ::
+	//  "rax", "rbx", "rcx", "rdx"
+	//);
 
-	end = ((uint64_t)cycles_high1 <<32 | cycles_low1);
+	//end = ((uint64_t)cycles_high1 <<32 | cycles_low1);
+    cpu_time_used = ((double) (end - begin)) / CLOCKS_PER_SEC;
 
 	printf("+++++After moved to node 1+++++\n");
 	for (i = 0; i < page_count; ++i) {
@@ -222,8 +228,8 @@ int main(int argc, char **argv)
 
 
 	printf("Total_cycles\tBegin_timestamp\tEnd_timestamp\n"
-		   "%llu\t%llu\t%llu\n",
-		   (end-begin), begin, end);
+		   "%f\t%llu\t%llu\n",
+		   cpu_time_used, begin, end);
 	printf("%s", stats_buffer);
 
 

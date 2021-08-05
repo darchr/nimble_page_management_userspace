@@ -6,16 +6,16 @@ COPY_METHOD="seq mt"
 BATCH_MODE="batch no_batch"
 MULTI="1 2 4 8 16"
 
-if [ ! -d dram_thp_verify ]; then
-	mkdir dram_thp_verify
+if [ ! -d dram_non_thp_verify ]; then
+	mkdir dram_non_thp_verify
 fi
 
 if [ ! -d dram_stats_4kb ]; then
 	mkdir dram_stats_4kb
 fi
 
-if [ ! -d nv_thp_verify ]; then
-	mkdir nv_thp_verify
+if [ ! -d nv_non_thp_verify ]; then
+	mkdir nv_non_thp_verify
 fi
 
 if [ ! -d nv_stats_4kb ]; then
@@ -40,9 +40,9 @@ for I in `seq 1 5`; do
 					echo "NUM_PAGES: "${NUM_PAGES}", METHOD: "${PARAM}", BATCH: "${BATCH}", MT: "${MT}
 
 					if [[ "x${I}" == "x1" ]]; then
-						numactl -N 0 ./non_thp_move_pages_dram ${NUM_PAGES} ${PARAM} ${BATCH} 2>./dram_thp_verify/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" > ./dram_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
+						numactl -N 0 ./non_thp_move_pages_dram ${NUM_PAGES} ${PARAM} ${BATCH} 2>./dram_non_thp_verify/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" > ./dram_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
 					else
-						numactl -N 0 ./non_thp_move_pages_dram ${NUM_PAGES} ${PARAM} ${BATCH} 2>./dram_thp_verify/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" >> ./dram_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
+						numactl -N 0 ./non_thp_move_pages_dram ${NUM_PAGES} ${PARAM} ${BATCH} 2>./dram_non_thp_verify/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" >> ./dram_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
 					fi
 
 					sleep 5
@@ -53,9 +53,9 @@ for I in `seq 1 5`; do
 					echo "NUM_PAGES: "${NUM_PAGES}", METHOD: "${PARAM}", BATCH: "${BATCH}", MT: "${MT}
 
 					if [[ "x${I}" == "x1" ]]; then
-						numactl -N 0 ./non_thp_move_pages_nv ${NUM_PAGES} ${PARAM} ${BATCH} 2>./thp_verify_nv/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" > ./nv_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
+						numactl -N 0 ./non_thp_move_pages_nv ${NUM_PAGES} ${PARAM} ${BATCH} 2>./nv_non_thp_verify/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" > ./nv_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
 					else
-						numactl -N 0 ./non_thp_move_pages_nv ${NUM_PAGES} ${PARAM} ${BATCH} 2>./thp_verify_nv/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" >> ./nv_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
+						numactl -N 0 ./non_thp_move_pages_nv ${NUM_PAGES} ${PARAM} ${BATCH} 2>./nv_non_thp_verify/${METHOD}_${MT}_4kb_page_order_${N}_${BATCH} | grep -A 3 "\(Total_cycles\|Test successful\)" >> ./nv_stats_4kb/${METHOD}_${MT}_page_order_${N}_exchange_${BATCH}
 					fi
 
 					sleep 5
